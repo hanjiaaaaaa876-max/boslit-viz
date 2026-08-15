@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>German in Translation · BOSLIT</title>
+  <link href="https://fonts.googleapis.com/css2?family=ADLaM+Display&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html,body { width:100%;height:100%;overflow:hidden;background:#f2f2f0;font-family:'ADLaM Display',Georgia,serif; }
+
+    #page {
+      position:absolute;width:1280px;height:832px;
+      background:#fff;transform-origin:top left;overflow:hidden;
+    }
+
+    /* ── TOP BAR ─── */
+    #topbar {
+      position:absolute;left:0;top:0;width:1280px;height:54px;
+      display:flex;align-items:center;padding:0 20px;gap:16px;
+      border-bottom:1px solid rgba(0,0,0,0.08);z-index:10;background:#fff;
+    }
+    #back-btn {
+      display:inline-flex;align-items:center;gap:6px;
+      padding:5px 13px 5px 9px;border:1.5px solid #00909B;
+      border-radius:20px;color:#00909B;text-decoration:none;
+      font-size:12px;flex-shrink:0;transition:background .18s,color .18s;
+    }
+    #back-btn:hover{background:#00909B;color:#fff;}
+    #back-btn svg{width:12px;height:12px;}
+    #back-btn:hover path{stroke:#fff;}
+    .page-title{font-size:19px;color:#000;flex:1;white-space:nowrap;}
+    .page-sub{font-size:10.5px;color:rgba(0,0,0,0.32);margin-top:1px;}
+    #toggle-wrap{display:flex;align-items:center;background:#f4f3f0;border-radius:28px;padding:3px;flex-shrink:0;}
+    .tbtn{padding:5px 14px;border:none;border-radius:25px;font-family:'ADLaM Display',serif;font-size:11.5px;cursor:pointer;transition:background .18s,color .18s;color:#444;background:transparent;}
+    .tbtn.active{background:#0C5F69;color:#fff;}
+
+    /* ── LEFT SEARCH PANEL ─── */
+    #search-panel {
+      position:absolute;left:0;top:54px;width:268px;height:778px;
+      border-right:1px solid rgba(0,0,0,0.09);
+      display:flex;flex-direction:column;background:#fafaf8;
+      overflow:hidden;
+    }
+    #sp-header{
+      padding:14px 16px 10px;border-bottom:1px solid rgba(0,0,0,0.07);flex-shrink:0;
+    }
+    #sp-header-title{font-size:10px;letter-spacing:0.08em;color:rgba(0,0,0,0.38);margin-bottom:4px;}
+    #sp-stats-line{font-size:12.5px;color:#000;}
+    #sp-stats-line span{color:rgba(0,0,0,0.38);}
+
+    /* Search input */
+    #sp-input-wrap{
+      position:relative;padding:10px 14px 8px;flex-shrink:0;
+      border-bottom:1px solid rgba(0,0,0,0.07);
+    }
+    #sp-input-wrap svg{position:absolute;left:24px;top:50%;transform:translateY(-50%);pointer-events:none;}
+    #sp-input{
+      width:100%;padding:8px 28px 8px 32px;
+      border:1.5px solid rgba(0,0,0,0.14);border-radius:20px;
+      font-family:'ADLaM Display',serif;font-size:12px;
+      background:#fff;outline:none;transition:border-color .15s;
+    }
+    #sp-input:focus{border-color:#00909B;}
+    #sp-input-clear{
+      position:absolute;right:22px;top:50%;transform:translateY(-50%);
+      background:none;border:none;cursor:pointer;font-size:15px;
+      color:rgba(0,0,0,0.35);display:none;padding:2px 4px;
+    }
+
+    /* Filters */
+    #sp-filters{padding:10px 14px 6px;flex-shrink:0;border-bottom:1px solid rgba(0,0,0,0.07);}
+    .filter-row{margin-bottom:8px;}
+    .filter-row-label{font-size:9.5px;letter-spacing:0.07em;color:rgba(0,0,0,0.38);margin-bottom:5px;}
+    .filter-pills{display:flex;flex-wrap:wrap;gap:4px;}
+    .fpill{
+      padding:3px 9px;border:1px solid rgba(0,0,0,0.16);
+      border-radius:14px;font-size:10.5px;cursor:pointer;
+      background:#fff;color:#333;transition:all .15s;
+    }
+    .fpill:hover{border-color:#00909B;color:#00909B;}
+    .fpill.active{background:#0C5F69;color:#fff;border-color:#0C5F69;}
+
+    /* Period dropdown */
+    .period-wrap{position:relative;}
+    #period-btn{
+      display:flex;align-items:center;gap:6px;
+      padding:5px 12px;border:1px solid rgba(0,0,0,0.16);border-radius:14px;
+      font-family:'ADLaM Display',serif;font-size:10.5px;cursor:pointer;
+      background:#fff;color:#333;transition:all .15s;width:100%;text-align:left;
+    }
+    #period-btn.has-filter{background:#0C5F69;color:#fff;border-color:#0C5F69;}
+    #period-btn svg{width:10px;height:10px;margin-left:auto;flex-shrink:0;}
+    #period-dropdown{
+      position:absolute;top:calc(100% + 4px);left:0;width:100%;z-index:40;
+      background:#fff;border:1px solid rgba(0,0,0,0.12);border-radius:12px;
+      box-shadow:0 6px 24px rgba(0,0,0,0.12);
+      max-height:220px;overflow-y:auto;display:none;
+      padding:6px;
+    }
+    #period-dropdown.open{display:block;}
+    .pd-item{
+      display:flex;align-items:center;gap:8px;
+      padding:5px 10px;border-radius:8px;cursor:pointer;font-size:11px;
+    }
+    .pd-item:hover{background:#f5f5f3;}
+    .pd-item input{accent-color:#0C5F69;width:13px;height:13px;cursor:pointer;}
+    .pd-count{margin-left:auto;color:rgba(0,0,0,0.35);font-size:10px;}
+
+    /* Results */
+    #sp-count-row{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:6px 14px 5px;flex-shrink:0;
+    }
+    #sp-count{font-size:10.5px;color:rgba(0,0,0,0.42);}
+    #sp-clear-all{
+      font-size:10px;color:#00909B;background:none;border:none;
+      cursor:pointer;display:none;font-family:'ADLaM Display',serif;
+    }
+    #sp-results{
+      flex:1;overflow-y:auto;padding:6px 10px;
+    }
+    #sp-results::-webkit-scrollbar{width:3px;}
+    #sp-results::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.15);border-radius:2px;}
+    .result-card{
+      padding:9px 10px;border-radius:10px;cursor:pointer;
+      transition:background .12s;margin-bottom:3px;
+      border:1px solid transparent;
+    }
+    .result-card:hover{background:#f0f8f8;border-color:rgba(0,182,169,0.2);}
+    .result-card.active{background:#e6f5f5;border-color:#00909B;}
+    .rc-title{font-size:12px;color:#000;line-height:1.3;}
+    .rc-meta{font-size:10.5px;color:rgba(0,0,0,0.45);margin-top:2px;}
+    .rc-genre{
+      display:inline-block;font-size:9.5px;
+      padding:1px 7px;border-radius:8px;margin-top:3px;
+    }
+
+    /* ── MAIN CANVAS AREA ─── */
+    #canvas-wrap{
+      position:absolute;left:276px;top:54px;
+      width:734px;height:778px;
+      display:flex;align-items:center;justify-content:center;
+    }
+    #radial-canvas{display:block;cursor:default;}
+
+    /* Year label strip (right of canvas, inside canvas-wrap) */
+    #time-labels{
+      position:absolute;right:0;top:0;width:100%;height:100%;
+      pointer-events:none;
+    }
+
+    /* Inner void label */
+    #inner-void{
+      position:absolute;text-align:center;pointer-events:none;
+      left:50%;top:50%;transform:translate(-50%,-50%);
+    }
+    .iv-main{font-size:11px;color:rgba(0,0,0,0.28);}
+    .iv-sub {font-size:9.5px;color:rgba(0,0,0,0.18);margin-top:1px;}
+
+    /* ── RIGHT DETAIL PANEL ─── */
+    #detail-panel{
+      position:absolute;right:0;top:54px;width:272px;height:778px;
+      background:#fff;border-left:1px solid rgba(0,0,0,0.09);
+      display:flex;flex-direction:column;overflow:hidden;
+    }
+    /* Empty state */
+    #dp-empty{
+      flex:1;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      padding:24px;gap:14px;
+    }
+    #dp-empty svg{opacity:0.13;}
+    #dp-empty-msg{font-size:12px;color:rgba(0,0,0,0.38);text-align:center;line-height:1.6;}
+    #dp-timeline{width:100%;padding:0 20px 16px;}
+    #dp-timeline-label{font-size:9.5px;letter-spacing:0.07em;color:rgba(0,0,0,0.30);margin-bottom:8px;}
+    .tl-row{display:flex;align-items:center;gap:5px;margin-bottom:2.5px;}
+    .tl-year{font-size:8.5px;color:rgba(0,0,0,0.32);width:66px;flex-shrink:0;}
+    .tl-bar{height:5px;border-radius:3px;background:#00B6A9;}
+
+    /* Active state — two-section layout */
+    #dp-active{display:none;flex:1;flex-direction:column;overflow:hidden;}
+    #dp-active.show{display:flex;}
+
+    /* ── Upper: ring overview ── */
+    #dp-ring-overview{flex-shrink:0;}
+    #dp-top{padding:14px 18px 10px;border-bottom:1px solid rgba(0,0,0,0.07);}
+    #dp-period{font-size:18px;color:#000;}
+    #dp-count{font-size:11px;color:rgba(0,0,0,0.4);margin-top:2px;}
+    #dp-breakdown-wrap{padding:10px 18px 12px;border-bottom:2px dashed rgba(0,0,0,0.08);}
+    .dp-section-title{font-size:9.5px;letter-spacing:0.07em;color:rgba(0,0,0,0.35);margin-bottom:8px;}
+    .genre-bar-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+    .genre-bar-label{width:80px;flex-shrink:0;font-size:10px;}
+    .genre-bar-track{flex:1;height:5px;background:#f0f0ee;border-radius:3px;overflow:hidden;}
+    .genre-bar-fill{height:100%;border-radius:3px;}
+    .genre-bar-pct{width:28px;text-align:right;color:rgba(0,0,0,0.4);font-size:10px;}
+
+    /* ── Lower: selected record ── */
+    #dp-sel-record{
+      flex:1;display:flex;flex-direction:column;overflow:hidden;
+      background:#fafaf8;
+    }
+    #dp-sel-header{
+      padding:9px 18px 6px;border-bottom:1px solid rgba(0,0,0,0.07);flex-shrink:0;
+    }
+    #dp-sel-empty{
+      flex:1;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;padding:18px;
+    }
+    #dp-sel-empty p{font-size:11px;color:rgba(0,0,0,0.33);text-align:center;line-height:1.7;margin-top:8px;}
+    #dp-sel-empty svg{opacity:0.18;}
+    #dp-sel-content{flex:1;overflow-y:auto;padding:12px 18px;display:none;}
+    #dp-sel-content::-webkit-scrollbar{width:3px;}
+    #dp-sel-content::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:2px;}
+    .dp-field{font-size:11.5px;line-height:2.0;}
+    .dp-field em{color:rgba(0,0,0,0.38);font-style:normal;display:inline-block;width:86px;}
+    .dp-data-note{font-size:9.5px;color:rgba(0,0,0,0.28);margin-top:12px;line-height:1.5;font-style:italic;}
+
+    /* ── HOW TO READ button + panel ── */
+    #htr-btn{
+      position:absolute;left:284px;bottom:62px;
+      width:28px;height:28px;border-radius:50%;
+      background:#0C5F69;border:none;cursor:pointer;
+      color:#fff;font-size:13px;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 2px 8px rgba(0,0,0,0.2);z-index:25;
+      font-family:'ADLaM Display',serif;
+    }
+    #htr-panel{
+      position:absolute;left:288px;bottom:98px;
+      width:244px;background:#fff;border-radius:14px;
+      border:1px solid rgba(0,0,0,0.12);
+      box-shadow:0 4px 20px rgba(0,0,0,0.14);
+      padding:14px 16px;display:none;z-index:26;
+    }
+    #htr-panel.show{display:block;}
+    #htr-panel h4{font-size:11.5px;margin-bottom:10px;color:#0C5F69;letter-spacing:0.04em;}
+    .htr-item{display:flex;align-items:flex-start;gap:9px;margin-bottom:9px;font-size:11px;line-height:1.45;color:rgba(0,0,0,0.75);}
+    .htr-icon{flex-shrink:0;margin-top:1px;}
+
+    /* ── LEGEND STRIP ─── */
+    #legend-strip{
+      position:absolute;left:276px;bottom:0;width:734px;height:54px;
+      display:flex;align-items:center;justify-content:center;gap:14px;
+      background:#fafaf8;border-top:1px solid rgba(0,0,0,0.07);
+      padding:0 16px;flex-wrap:wrap;
+    }
+    .ls-label{font-size:9.5px;letter-spacing:0.06em;color:rgba(0,0,0,0.32);margin-right:4px;flex-shrink:0;}
+    .ls-item{display:flex;align-items:center;gap:5px;font-size:10.5px;color:rgba(0,0,0,0.7);flex-shrink:0;}
+    .ls-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+    /* ── HOVER TOOLTIP ─── */
+    #ring-tooltip{
+      position:absolute;pointer-events:none;display:none;
+      background:rgba(12,95,105,0.92);color:#fff;
+      border-radius:10px;padding:6px 12px;
+      z-index:50;backdrop-filter:blur(4px);
+    }
+    #rt-title{font-size:12px;}
+    #rt-sub{font-size:10px;opacity:0.75;margin-top:1px;}
+
+    /* ── ONBOARDING BANNER ─── */
+    #onboard{
+      position:absolute;
+      left:276px;bottom:60px;
+      width:734px;
+      display:flex;justify-content:center;
+      pointer-events:none;
+      transition:opacity 1s;
+      z-index:20;
+    }
+    #onboard-inner{
+      background:rgba(12,95,105,0.88);color:#fff;
+      border-radius:24px;padding:10px 22px;
+      font-size:12px;line-height:1.5;text-align:center;
+      backdrop-filter:blur(6px);
+      pointer-events:auto;
+    }
+    #onboard-inner strong{font-weight:bold;}
+    #onboard.hidden{opacity:0;pointer-events:none;}
+  </style>
+</head>
+<body>
+<div id="page">
+
+  <!-- Top bar -->
+  <div id="topbar">
+    <a id="back-btn" href="index.html">
+      <svg viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6L8 10" stroke="#00909B" stroke-width="1.7" stroke-linecap="round"/></svg>
+      Language Forest
+    </a>
+    <div>
+      <div class="page-title">German in Translation</div>
+      <div class="page-sub">500 years of Scottish literature in German — each dot is one translation</div>
+    </div>
+    <div style="flex:1"></div>
+    <div id="toggle-wrap">
+      <button class="tbtn active" id="btn-genre">Genre</button>
+      <button class="tbtn" id="btn-gender">Gender</button>
+    </div>
+  </div>
+
+  <!-- Left search panel -->
+  <div id="search-panel">
+    <div id="sp-header">
+      <div id="sp-header-title">EXPLORE RECORDS</div>
+      <div id="sp-stats-line">5,126 records <span>· 1511–2012</span></div>
+    </div>
+
+    <div id="sp-input-wrap">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="top:50%;left:24px;position:absolute;transform:translateY(-50%);pointer-events:none">
+        <circle cx="5.5" cy="5.5" r="4" stroke="rgba(0,0,0,0.3)" stroke-width="1.4"/>
+        <line x1="8.5" y1="8.5" x2="12" y2="12" stroke="rgba(0,0,0,0.3)" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <input id="sp-input" type="text" placeholder="Search titles, authors, translators…">
+      <button id="sp-input-clear">×</button>
+    </div>
+
+    <div id="sp-filters">
+      <!-- Period filter -->
+      <div class="filter-row">
+        <div class="filter-row-label">PERIOD</div>
+        <div class="period-wrap">
+          <button id="period-btn">
+            All periods
+            <svg viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </button>
+          <div id="period-dropdown"></div>
+        </div>
+      </div>
+
+      <!-- Genre filter -->
+      <div class="filter-row">
+        <div class="filter-row-label">GENRE</div>
+        <div class="filter-pills" id="genre-pills"></div>
+      </div>
+
+      <!-- Gender filter -->
+      <div class="filter-row">
+        <div class="filter-row-label">GENDER</div>
+        <div class="filter-pills" id="gender-pills"></div>
+      </div>
+    </div>
+
+    <div id="sp-count-row">
+      <span id="sp-count"></span>
+      <button id="sp-clear-all">Clear all ×</button>
+    </div>
+
+    <div id="sp-results"></div>
+  </div>
+
+  <!-- Canvas area -->
+  <div id="canvas-wrap">
+    <canvas id="radial-canvas" width="640" height="640"></canvas>
+    <div id="inner-void">
+      <div class="iv-main">Inner Void</div>
+      <div class="iv-sub">Undated · 193</div>
+    </div>
+  </div>
+
+  <!-- Legend strip -->
+  <div id="legend-strip">
+    <span class="ls-label" id="legend-label">GENRE</span>
+    <div id="legend-items" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;"></div>
+  </div>
+
+  <!-- How to read button + panel -->
+  <button id="htr-btn" title="How to read this chart">?</button>
+  <div id="htr-panel">
+    <h4>HOW TO READ THIS CHART</h4>
+    <div class="htr-item">
+      <svg class="htr-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="7" cy="7" r="6" stroke="#0C5F69" stroke-width="1.2" stroke-dasharray="3 2"/>
+        <circle cx="7" cy="7" r="3" stroke="#0C5F69" stroke-width="1"/>
+      </svg>
+      <span>Each <strong>ring = 30 years</strong> of translation activity</span>
+    </div>
+    <div class="htr-item">
+      <svg class="htr-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <rect x="2" y="5" width="10" height="4" rx="2" fill="#0C5F69" opacity="0.6"/>
+        <rect x="2" y="9.5" width="10" height="2" rx="1" fill="#0C5F69" opacity="0.3"/>
+      </svg>
+      <span>Ring <strong>thickness</strong> shows record count — thicker = more translations</span>
+    </div>
+    <div class="htr-item">
+      <svg class="htr-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="4" cy="7" r="2.5" fill="#89FE99"/>
+        <circle cx="10" cy="7" r="2.5" fill="#F4A7B9"/>
+      </svg>
+      <span>Dot <strong>colour</strong> = genre (or gender in Gender view)</span>
+    </div>
+    <div class="htr-item">
+      <svg class="htr-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="7" cy="7" r="2.5" fill="#0C5F69"/>
+        <circle cx="7" cy="7" r="5" stroke="#0C5F69" stroke-width="1" opacity="0.4"/>
+      </svg>
+      <span>Each <strong>dot = one translation record</strong> in the BOSLIT dataset</span>
+    </div>
+    <div class="htr-item">
+      <svg class="htr-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="7" cy="7" r="5.5" stroke="#BBBBBB" stroke-width="1" stroke-dasharray="2.5 1.5"/>
+      </svg>
+      <span>The <strong>inner void</strong> holds 193 undated records</span>
+    </div>
+    <div style="margin-top:6px;font-size:10px;color:rgba(0,0,0,0.35);line-height:1.5;">
+      Click any ring to see overview · Click a dot to see its record
+    </div>
+  </div>
+
+  <!-- Right detail panel -->
+  <div id="detail-panel">
+    <!-- Empty state: nothing selected -->
+    <div id="dp-empty">
+      <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+        <circle cx="28" cy="28" r="26" stroke="#000" stroke-width="1.1" stroke-dasharray="4 2.5"/>
+        <circle cx="28" cy="28" r="17" stroke="#000" stroke-width="0.9" stroke-dasharray="3 2"/>
+        <circle cx="28" cy="28" r="8"  stroke="#000" stroke-width="0.7"/>
+      </svg>
+      <div id="dp-empty-msg">Click any ring to explore<br>records from that period</div>
+      <div id="dp-timeline">
+        <div id="dp-timeline-label">RECORDS BY PERIOD</div>
+        <div id="dp-timeline-bars"></div>
+      </div>
+    </div>
+
+    <!-- Active state: ring or dot selected -->
+    <div id="dp-active">
+      <!-- UPPER: ring overview -->
+      <div id="dp-ring-overview">
+        <div id="dp-top">
+          <div id="dp-period">—</div>
+          <div id="dp-count"></div>
+        </div>
+        <div id="dp-breakdown-wrap">
+          <div class="dp-section-title" id="dp-breakdown-title">GENRE BREAKDOWN</div>
+          <div id="dp-genre-breakdown"></div>
+        </div>
+      </div>
+
+      <!-- LOWER: selected record -->
+      <div id="dp-sel-record">
+        <div id="dp-sel-header">
+          <div class="dp-section-title" style="margin:0">SELECTED RECORD</div>
+        </div>
+        <!-- placeholder when no dot clicked -->
+        <div id="dp-sel-empty">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="6" stroke="#000" stroke-width="1.2"/>
+            <circle cx="14" cy="14" r="12" stroke="#000" stroke-width="0.8" stroke-dasharray="3 2"/>
+          </svg>
+          <p>Click any dot<br>to see its record details</p>
+        </div>
+        <!-- filled when dot clicked -->
+        <div id="dp-sel-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hover tooltip -->
+  <div id="ring-tooltip">
+    <div id="rt-title"></div>
+    <div id="rt-sub"></div>
+  </div>
+
+  <!-- Onboarding banner -->
+  <div id="onboard">
+    <div id="onboard-inner">
+      Each <strong>ring = 30 years</strong> · Ring thickness = number of translations ·
+      <strong>Click any ring</strong> to explore · Use search on the left to find records
+    </div>
+  </div>
+
+</div><!-- #page -->
+
+<script>
+/* ═══════════════════════════════════════════
+   SCALE TO FIT
+═══════════════════════════════════════════ */
+function scaleToFit() {
+  const s = Math.min(window.innerWidth/1280, window.innerHeight/832);
+  const p = document.getElementById('page');
+  p.style.transform = `scale(${s})`;
+  p.style.left = ((window.innerWidth  - 1280*s)/2) + 'px';
+  p.style.top  = ((window.innerHeight - 832 *s)/2) + 'px';
+}
+window.addEventListener('resize', scaleToFit);
+scaleToFit();
+
+/* ═══════════════════════════════════════════
+   COLORS
+═══════════════════════════════════════════ */
+const GENRE_COLORS = {
+  'Fiction':               '#89FE99',
+  'Poetry':                '#35DBA7',
+  'Prose literature':      '#00B6A9',
+  "Children's literature": '#009999',
+  'Short stories':         '#1D6B7F',
+  'Drama':                 '#2F4858',
+  'Unknown':               '#AAAAAA',
+};
+const GENDER_COLORS = { Female:'#F4A7B9', Male:'#6EB5D4', Unknown:'#BBBBBB' };
+
+/* ═══════════════════════════════════════════
+   DATA — filled by async init()
+═══════════════════════════════════════════ */
+let ALL_RECORDS = [];
+let recordById  = {};
+let PERIOD_DATA = [];
+let GENRE_DIST  = [];  // [[name, pct], …]
+let GENDER_DIST = [];
+let STATS       = {};
+let MAX_CNT     = 1;
+
+/* ═══════════════════════════════════════════
+   RING GEOMETRY
+═══════════════════════════════════════════ */
+const VOID_R   = 60;
+const RING_GAP = 4;
+const DOT_R    = 2.2;
+
+function ringWidth(count) {
+  return Math.max(5, Math.pow(count / MAX_CNT, 0.6) * 28);
+}
+
+let geoms = [];
+function buildGeoms() {
+  let r = VOID_R;
+  geoms = PERIOD_DATA.map(({label, count}) => {
+    const w      = ringWidth(count);
+    const innerR = r + RING_GAP;
+    const outerR = innerR + w;
+    r = outerR;
+    return {label, count, innerR, outerR, midR: (innerR + outerR) / 2};
+  });
+}
+
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+let viewMode           = 'genre';
+let selectedRing       = null;
+let selectedDot        = null;
+let highlightedPeriods = new Set(); // for ring label fading only
+let highlightedRecIds  = new Set(); // for per-dot fading when genre/gender/text filters active
+let dots               = [];
+let activeRec          = null;
+
+/* ═══════════════════════════════════════════
+   SEEDED RNG
+═══════════════════════════════════════════ */
+function makeRand(seed) {
+  let s = seed >>> 0;
+  return () => { s = Math.imul(1664525, s) + 1013904223 >>> 0; return s / 4294967296; };
+}
+
+/* ═══════════════════════════════════════════
+   BUILD DOTS — assigns real records to dots
+═══════════════════════════════════════════ */
+function buildDots() {
+  const canvas = document.getElementById('radial-canvas');
+  const cx = canvas.width / 2, cy = canvas.height / 2;
+  dots = [];
+
+  // Group records by period
+  const byPeriod = {};
+  const undated  = [];
+  ALL_RECORDS.forEach(r => {
+    if (!r.period) undated.push(r);
+    else (byPeriod[r.period] = byPeriod[r.period] || []).push(r);
+  });
+
+  // Inner void — shuffle undated records deterministically
+  const vr = makeRand(88888);
+  const shuffledUndated = [...undated];
+  for (let i = shuffledUndated.length - 1; i > 0; i--) {
+    const j = Math.floor(vr() * (i + 1));
+    [shuffledUndated[i], shuffledUndated[j]] = [shuffledUndated[j], shuffledUndated[i]];
+  }
+  shuffledUndated.forEach(rec => {
+    const a = vr() * Math.PI * 2;
+    const r = Math.sqrt(vr()) * (VOID_R - DOT_R - 6);
+    dots.push({
+      x: cx + r * Math.cos(a), y: cy + r * Math.sin(a),
+      r: DOT_R * 0.7, decade: null,
+      genre: rec.genre, gender: rec.gender,
+      isVoid: true, recId: rec.id,
+    });
+  });
+
+  // Ring dots — row-based placement, real record assigned to each slot
+  const ROW_PITCH = DOT_R * 2 + 0.9;
+  const DOT_STEP  = DOT_R * 2 + 0.4;
+  geoms.forEach(({label, count, innerR, outerR}, pi) => {
+    const rand  = makeRand(pi * 7919 + 31337);
+    const nRows = Math.max(1, Math.floor((outerR - innerR) / ROW_PITCH));
+    const slots = [];
+    for (let row = 0; row < nRows; row++) {
+      const rowR = innerR + DOT_R + row * ROW_PITCH;
+      const nS   = Math.floor(2 * Math.PI * rowR / DOT_STEP);
+      const off  = (row % 2) * (Math.PI / nS);
+      for (let i = 0; i < nS; i++) slots.push({angle: (i / nS) * Math.PI * 2 + off, r: rowR});
+    }
+    for (let i = slots.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [slots[i], slots[j]] = [slots[j], slots[i]];
+    }
+
+    // Shuffle this period's records with the same RNG stream
+    const periodRecs = [...(byPeriod[label] || [])];
+    for (let i = periodRecs.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [periodRecs[i], periodRecs[j]] = [periodRecs[j], periodRecs[i]];
+    }
+
+    const n = Math.min(count, slots.length);
+    for (let i = 0; i < n; i++) {
+      const {angle, r} = slots[i];
+      const rec = periodRecs[i];
+      dots.push({
+        x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle),
+        r: DOT_R, decade: label,
+        genre:  rec ? rec.genre  : 'Unknown',
+        gender: rec ? rec.gender : 'Unknown',
+        isVoid: false,
+        recId:  rec ? rec.id : null,
+      });
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════
+   DRAW
+═══════════════════════════════════════════ */
+function getColor(dot) {
+  if (dot.isVoid) {
+    // Show grey when no genre/gender/search filter active (emphasise "undated" identity)
+    const hasColorFilter = filterState.genres.size || filterState.genders.size || filterState.query;
+    if (!hasColorFilter) return '#CCCCCC';
+  }
+  if (viewMode === 'genre') return GENRE_COLORS[dot.genre] || '#AAAAAA';
+  return GENDER_COLORS[dot.gender] || '#BBBBBB';
+}
+
+function redraw() {
+  const canvas = document.getElementById('radial-canvas');
+  const ctx    = canvas.getContext('2d');
+  const cx = canvas.width / 2, cy = canvas.height / 2;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  dots.forEach(dot => {
+    const isSel = dot === selectedDot;
+    let alpha = 1.0;
+    if (highlightedRecIds.size) {
+      // Filter active — void dots now participate too (no !dot.isVoid exception)
+      if (dot !== selectedDot && !highlightedRecIds.has(dot.recId)) alpha = 0.10;
+    } else if ((selectedRing || highlightedPeriods.size) && !dot.isVoid) {
+      // Ring click — fade dots outside the selected ring (void dots stay grey, don't dim)
+      const inSel = selectedRing && dot.decade === selectedRing;
+      if (!inSel) alpha = 0.10;
+    }
+    // Three-level hierarchy when a dot is selected alongside active filters:
+    // selected=1.0 · other highlighted=0.55 · non-highlighted=0.18
+    if (selectedDot && dot !== selectedDot && !dot.isVoid) {
+      if (highlightedRecIds.size && highlightedRecIds.has(dot.recId)) {
+        alpha = Math.min(alpha, 0.55);
+      } else {
+        alpha = Math.min(alpha, 0.18);
+      }
+    }
+
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.arc(dot.x, dot.y, isSel ? dot.r * 2.8 : dot.r, 0, Math.PI * 2);
+    ctx.fillStyle = getColor(dot);
+    ctx.fill();
+    if (isSel) {
+      // Inner white ring — separates dot from outer glow
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+      // Middle accent ring — always teal, visible even on grey dots
+      ctx.beginPath();
+      ctx.arc(dot.x, dot.y, dot.r * 3.8, 0, Math.PI * 2);
+      ctx.strokeStyle = '#0C5F69'; ctx.lineWidth = 2; ctx.globalAlpha = alpha * 0.9; ctx.stroke();
+      // Outer soft halo
+      ctx.beginPath();
+      ctx.arc(dot.x, dot.y, dot.r * 5.5, 0, Math.PI * 2);
+      ctx.strokeStyle = '#0C5F69'; ctx.lineWidth = 1; ctx.globalAlpha = alpha * 0.3; ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  });
+
+  drawRingLabels(ctx, cx, cy);
+}
+
+const LABEL_IDXS   = [10, 11, 12, 13, 14, 15, 16];
+const LABEL_ANGLES = [-58, -42, -25, -8, 9, 26, 44];
+
+function drawRingLabels(ctx, cx, cy) {
+  const earlyAlpha = (selectedRing || highlightedPeriods.size || highlightedRecIds.size) ? 0.18 : 0.4;
+  ctx.globalAlpha = earlyAlpha;
+  ctx.font = '7.5px "ADLaM Display",Georgia,serif';
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('pre-1780', cx - 90, cy - 90);
+  ctx.globalAlpha = 1;
+
+  LABEL_IDXS.forEach((idx, j) => {
+    if (idx >= geoms.length) return;
+    const {label, outerR} = geoms[idx];
+    const angRad = LABEL_ANGLES[j] * Math.PI / 180;
+    const tx = cx + (outerR + 8) * Math.cos(angRad);
+    const ty = cy + (outerR + 8) * Math.sin(angRad);
+    const bx = cx + outerR * Math.cos(angRad);
+    const by = cy + outerR * Math.sin(angRad);
+
+    const isSel  = selectedRing === label;
+    const isHL   = highlightedPeriods.has(label);
+    const active = isSel || isHL;
+    const alpha  = (selectedRing || highlightedPeriods.size) ? (active ? 1 : 0.22) : 0.7;
+
+    ctx.globalAlpha = alpha;
+    ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(tx, ty);
+    ctx.strokeStyle = active ? '#0C5F69' : 'rgba(0,0,0,0.45)';
+    ctx.lineWidth   = active ? 1.2 : 0.8;
+    ctx.stroke();
+
+    ctx.font      = `${active ? 'bold ' : ''}${active ? 9.5 : 9}px "ADLaM Display",Georgia,serif`;
+    ctx.fillStyle = active ? '#0C5F69' : 'rgba(0,0,0,0.6)';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, tx + 3, ty);
+    ctx.globalAlpha = 1;
+  });
+}
+
+/* ═══════════════════════════════════════════
+   CANVAS INTERACTIONS
+═══════════════════════════════════════════ */
+function getMouseInfo(e) {
+  const canvas = document.getElementById('radial-canvas');
+  const rect   = canvas.getBoundingClientRect();
+  const sx = canvas.width / rect.width, sy = canvas.height / rect.height;
+  const mx = (e.clientX - rect.left) * sx, my = (e.clientY - rect.top) * sy;
+  const cx = canvas.width / 2, cy = canvas.height / 2;
+  const dist = Math.hypot(mx - cx, my - cy);
+  const ring = geoms.find(g => dist >= g.innerR && dist <= g.outerR);
+  return {mx, my, cx, cy, dist, ring};
+}
+
+const canvas = document.getElementById('radial-canvas');
+
+// Returns true only if this dot is currently highlighted (not dimmed)
+function isDotClickable(dot) {
+  if (highlightedRecIds.size) return highlightedRecIds.has(dot.recId);
+  if (selectedRing) return !dot.isVoid && dot.decade === selectedRing;
+  if (highlightedPeriods.size) return !dot.isVoid && highlightedPeriods.has(dot.decade);
+  return true;
+}
+
+canvas.addEventListener('mousemove', e => {
+  const {mx, my, dist, ring} = getMouseInfo(e);
+  let nearDot = null, nearD = 12;
+  dots.forEach(d => {
+    if (!isDotClickable(d)) return;
+    const dd = Math.hypot(d.x - mx, d.y - my); if (dd < nearD) { nearD = dd; nearDot = d; }
+  });
+
+  const tip    = document.getElementById('ring-tooltip');
+  const pageEl = document.getElementById('page');
+  const pr     = pageEl.getBoundingClientRect();
+  const sc     = parseFloat(pageEl.style.transform.replace('scale(', '')) || 1;
+
+  if (ring || nearDot) {
+    canvas.style.cursor = 'pointer';
+    tip.style.left    = ((e.clientX - pr.left) / sc + 14) + 'px';
+    tip.style.top     = ((e.clientY - pr.top)  / sc - 46) + 'px';
+    tip.style.display = 'block';
+    if (nearDot) {
+      if (nearDot.isVoid) {
+        const rec = recordById[nearDot.recId];
+        document.getElementById('rt-title').textContent = rec ? (rec.title || 'Undated record') : 'Undated record';
+        document.getElementById('rt-sub').textContent   = 'Inner void · no publication year';
+      } else {
+        const rec = recordById[nearDot.recId];
+        document.getElementById('rt-title').textContent = rec ? (rec.title || nearDot.decade) : nearDot.decade;
+        document.getElementById('rt-sub').textContent   = nearDot.genre + (rec && rec.author ? ' · ' + rec.author : '');
+      }
+    } else {
+      document.getElementById('rt-title').textContent = ring.label;
+      document.getElementById('rt-sub').textContent   = ring.count.toLocaleString() + ' records';
+    }
+  } else {
+    canvas.style.cursor = 'default';
+    tip.style.display = 'none';
+  }
+});
+
+canvas.addEventListener('mouseleave', () => {
+  document.getElementById('ring-tooltip').style.display = 'none';
+});
+
+canvas.addEventListener('click', e => {
+  const {mx, my, dist, ring} = getMouseInfo(e);
+  dismissOnboard();
+
+  let nearDot = null, nearD = 14;
+  dots.forEach(d => {
+    if (!isDotClickable(d)) return;
+    const dd = Math.hypot(d.x - mx, d.y - my); if (dd < nearD) { nearD = dd; nearDot = d; }
+  });
+
+  if (nearDot) {
+    selectedDot  = nearDot;
+    selectedRing = nearDot.isVoid ? null : nearDot.decade;
+    highlightedPeriods.clear();
+    // Keep highlightedRecIds when filters are active so filter state is preserved
+    if (!hasActiveFilters()) highlightedRecIds.clear();
+    if (nearDot.isVoid) {
+      showVoidDetail(nearDot.recId);
+    } else {
+      const dotRing = geoms.find(g => g.label === nearDot.decade);
+      if (dotRing) showRingDetail(dotRing, true);
+      showDotRecord(nearDot);
+    }
+    redraw(); return;
+  }
+
+  if (hasActiveFilters()) {
+    // No highlighted dot found — check if we hit a dimmed dot or true empty space
+    let anyNear = false;
+    for (const d of dots) {
+      if (Math.hypot(d.x - mx, d.y - my) < 14) { anyNear = true; break; }
+    }
+    if (!anyNear) {
+      // True empty space → deselect dot but keep filter state
+      selectedDot = null; selectedRing = null; activeRec = null;
+      showEmpty(); redraw();
+    }
+    // Dimmed dot → no-op
+    return;
+  }
+
+  if (ring) {
+    selectedRing = ring.label; selectedDot = null; activeRec = null;
+    highlightedPeriods.clear(); highlightedRecIds.clear();
+    showRingDetail(ring);
+    redraw(); return;
+  }
+
+  if (!ring && dist > geoms[geoms.length - 1].outerR + 10) resetSelection();
+});
+
+function resetSelection() {
+  selectedRing = null; selectedDot = null; activeRec = null;
+  highlightedPeriods.clear(); highlightedRecIds.clear();
+  showEmpty(); redraw();
+}
+
+/* ═══════════════════════════════════════════
+   DETAIL PANEL
+═══════════════════════════════════════════ */
+function showEmpty() {
+  document.getElementById('dp-empty').style.display = 'flex';
+  document.getElementById('dp-active').classList.remove('show');
+}
+
+function computeBreakdown(ringDots, mode) {
+  const keys = mode === 'genre'
+    ? ['Fiction', 'Poetry', 'Prose literature', "Children's literature", 'Short stories', 'Drama']
+    : ['Male', 'Female', 'Unknown'];
+  const counts = {};
+  keys.forEach(k => counts[k] = 0);
+  ringDots.forEach(d => { const k = mode === 'genre' ? d.genre : d.gender; if (k in counts) counts[k]++; });
+  const total = ringDots.length || 1;
+  return keys.map(k => [k, counts[k] / total]);
+}
+
+function showRingDetail(ring, keepRecord) {
+  document.getElementById('dp-empty').style.display = 'none';
+  document.getElementById('dp-active').classList.add('show');
+  document.getElementById('dp-period').textContent = ring.label;
+  document.getElementById('dp-count').textContent  = ring.count.toLocaleString() + ' records';
+
+  // Compute breakdown from actual dots in this ring
+  const ringDots  = dots.filter(d => d.decade === ring.label);
+  const breakdown = computeBreakdown(ringDots, viewMode);
+  const cols      = viewMode === 'genre' ? GENRE_COLORS : GENDER_COLORS;
+  document.getElementById('dp-breakdown-title').textContent =
+    viewMode === 'genre' ? 'GENRE BREAKDOWN' : 'GENDER BREAKDOWN';
+  document.getElementById('dp-genre-breakdown').innerHTML = breakdown.map(([name, pct]) => {
+    const col = cols[name] || '#AAAAAA';
+    return `<div class="genre-bar-row">
+      <span class="genre-bar-label">${name.length > 12 ? name.substring(0, 10) + '…' : name}</span>
+      <div class="genre-bar-track"><div class="genre-bar-fill" style="width:${pct * 100}%;background:${col}"></div></div>
+      <span class="genre-bar-pct">${(pct * 100).toFixed(0)}%</span>
+    </div>`;
+  }).join('');
+
+  if (!keepRecord) {
+    document.getElementById('dp-sel-empty').style.display = 'flex';
+    document.getElementById('dp-sel-content').style.display = 'none';
+  }
+}
+
+function recHTML(rec) {
+  const genreCol = GENRE_COLORS[rec.genre] || '#AAAAAA';
+  const yearStr  = rec.year
+    ? rec.year
+    : '<span style="color:rgba(0,0,0,0.35);font-style:italic">unknown</span>';
+  return `
+    <div class="dp-field"><em>Title</em>${rec.title || '—'}</div>
+    <div class="dp-field"><em>Original</em>${rec.orig || '—'}</div>
+    <div class="dp-field"><em>Author</em>${rec.author || '—'}</div>
+    <div class="dp-field"><em>Translator</em>${rec.translator || '—'}</div>
+    <div class="dp-field"><em>Publisher</em>${rec.pub || '—'}</div>
+    <div class="dp-field"><em>Year</em>${yearStr}</div>
+    <div class="dp-field"><em>Genre</em>
+      <span style="background:${genreCol}22;color:${genreCol};padding:1px 8px;border-radius:8px;font-size:10.5px">${rec.genre}</span>
+    </div>
+    <div class="dp-field"><em>Gender</em>${rec.gender}</div>`;
+}
+
+function showDotRecord(dot) {
+  const rec = recordById[dot.recId];
+  const sel = document.getElementById('dp-sel-content');
+  document.getElementById('dp-sel-empty').style.display = 'none';
+  sel.style.display = 'block';
+  sel.innerHTML = rec ? recHTML(rec) : '<div class="dp-field">Record not found</div>';
+}
+
+function showVoidDetail(recId) {
+  document.getElementById('dp-empty').style.display = 'none';
+  document.getElementById('dp-active').classList.add('show');
+  const undatedCount = ALL_RECORDS.filter(r => !r.year).length;
+  document.getElementById('dp-period').textContent = 'Inner Void';
+  document.getElementById('dp-count').textContent  = `${undatedCount} undated records`;
+  document.getElementById('dp-breakdown-title').textContent = 'ABOUT UNDATED RECORDS';
+  document.getElementById('dp-genre-breakdown').innerHTML = `
+    <div style="font-size:11px;color:rgba(0,0,0,0.5);line-height:1.75;padding:2px 0">
+      These records exist in BOSLIT but carry no known publication year.
+      They are placed at the centre — outside the time rings.<br>
+      All other fields (genre, author, translator) are present.
+    </div>`;
+
+  const rec = recordById[recId];
+  const sel = document.getElementById('dp-sel-content');
+  document.getElementById('dp-sel-empty').style.display = 'none';
+  sel.style.display = 'block';
+  sel.innerHTML = rec ? recHTML(rec) : '<div class="dp-field">Record not found</div>';
+}
+
+function fillSelectedRecord(rec) {
+  const ring = geoms.find(g => g.label === rec.period);
+  if (ring) showRingDetail(ring, true);
+  const sel = document.getElementById('dp-sel-content');
+  document.getElementById('dp-sel-empty').style.display = 'none';
+  sel.style.display = 'block';
+  sel.innerHTML = recHTML(rec);
+}
+
+/* ═══════════════════════════════════════════
+   MINI TIMELINE (right panel empty state)
+═══════════════════════════════════════════ */
+function renderTimeline() {
+  const MAX  = Math.max(...PERIOD_DATA.map(p => p.count));
+  const html = PERIOD_DATA.map(({label, count}) => {
+    const w = Math.max(4, (count / MAX) * 120);
+    return `<div class="tl-row">
+      <span class="tl-year">${label.split('–')[0]}</span>
+      <div class="tl-bar" style="width:${w}px"></div>
+    </div>`;
+  }).join('');
+  document.getElementById('dp-timeline-bars').innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════
+   LEGEND STRIP
+═══════════════════════════════════════════ */
+function renderLegend() {
+  const dist = viewMode === 'genre' ? GENRE_DIST : GENDER_DIST;
+  const cols = viewMode === 'genre' ? GENRE_COLORS : GENDER_COLORS;
+  document.getElementById('legend-label').textContent = viewMode === 'genre' ? 'GENRE' : 'GENDER';
+  document.getElementById('legend-items').innerHTML = dist.map(([name, pct]) =>
+    `<div class="ls-item">
+       <span class="ls-dot" style="background:${cols[name] || '#AAAAAA'}"></span>
+       ${name} <span style="color:rgba(0,0,0,0.35);margin-left:3px">${(pct * 100).toFixed(0)}%</span>
+     </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════
+   GENRE / GENDER TOGGLE
+═══════════════════════════════════════════ */
+document.getElementById('btn-genre').addEventListener('click', () => {
+  viewMode = 'genre';
+  document.getElementById('btn-genre').classList.add('active');
+  document.getElementById('btn-gender').classList.remove('active');
+  renderLegend();
+  if (selectedRing) showRingDetail(geoms.find(g => g.label === selectedRing), !!selectedDot);
+  redraw();
+});
+document.getElementById('btn-gender').addEventListener('click', () => {
+  viewMode = 'gender';
+  document.getElementById('btn-gender').classList.add('active');
+  document.getElementById('btn-genre').classList.remove('active');
+  renderLegend();
+  if (selectedRing) showRingDetail(geoms.find(g => g.label === selectedRing), !!selectedDot);
+  redraw();
+});
+
+/* ═══════════════════════════════════════════
+   HOW TO READ TOGGLE
+═══════════════════════════════════════════ */
+document.getElementById('htr-btn').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('htr-panel').classList.toggle('show');
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('.period-wrap'))
+    document.getElementById('period-dropdown').classList.remove('open');
+  if (!document.getElementById('htr-panel').contains(e.target) &&
+      e.target !== document.getElementById('htr-btn'))
+    document.getElementById('htr-panel').classList.remove('show');
+});
+
+/* ═══════════════════════════════════════════
+   SEARCH PANEL
+═══════════════════════════════════════════ */
+const MAX_RESULTS = 50;
+const filterState = {periods: new Set(), genres: new Set(), genders: new Set(), query: ''};
+
+function buildSearchUI() {
+  // Period dropdown
+  document.getElementById('period-dropdown').innerHTML = PERIOD_DATA.map(({label, count}) =>
+    `<label class="pd-item">
+       <input type="checkbox" value="${label}" onchange="togglePeriod('${label}')">
+       ${label}<span class="pd-count">${count.toLocaleString()}</span>
+     </label>`).join('');
+
+  // Genre pills — use data-val to safely pass strings with apostrophes
+  document.getElementById('genre-pills').innerHTML = GENRE_DIST.map(([g]) =>
+    `<button class="fpill" data-val="${g}" onclick="toggleFilter('genres',this.dataset.val,this)">${g}</button>`
+  ).join('');
+
+  // Gender pills
+  const gnd = document.getElementById('gender-pills');
+  gnd.innerHTML = '';
+  ['Male', 'Female', 'Unknown'].forEach(g => {
+    const b = document.createElement('button');
+    b.className = 'fpill'; b.textContent = g;
+    b.onclick = () => toggleFilter('genders', g, b);
+    gnd.appendChild(b);
+  });
+
+  applySearch();
+}
+
+function togglePeriod(label) {
+  if (filterState.periods.has(label)) filterState.periods.delete(label);
+  else filterState.periods.add(label);
+  updatePeriodBtn();
+  applySearch();
+}
+function toggleFilter(key, val, el) {
+  if (filterState[key].has(val)) { filterState[key].delete(val); el.classList.remove('active'); }
+  else { filterState[key].add(val); el.classList.add('active'); }
+  applySearch();
+}
+function updatePeriodBtn() {
+  const btn   = document.getElementById('period-btn');
+  const n     = filterState.periods.size;
+  const label = n === 0 ? 'All periods' : `${n} period${n > 1 ? 's' : ''} selected`;
+  btn.classList.toggle('has-filter', n > 0);
+  btn.innerHTML = `${label}<svg viewBox="0 0 10 6" fill="none" style="width:10px;height:10px;margin-left:auto;flex-shrink:0"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+}
+
+document.getElementById('period-btn').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('period-dropdown').classList.toggle('open');
+});
+document.getElementById('sp-input').addEventListener('input', function() {
+  filterState.query = this.value.trim().toLowerCase();
+  document.getElementById('sp-input-clear').style.display = filterState.query ? 'block' : 'none';
+  applySearch();
+});
+document.getElementById('sp-input-clear').addEventListener('click', () => {
+  document.getElementById('sp-input').value = '';
+  filterState.query = '';
+  document.getElementById('sp-input-clear').style.display = 'none';
+  applySearch();
+});
+document.getElementById('sp-clear-all').addEventListener('click', () => {
+  filterState.periods.clear(); filterState.genres.clear();
+  filterState.genders.clear(); filterState.query = '';
+  document.getElementById('sp-input').value = '';
+  document.getElementById('sp-input-clear').style.display = 'none';
+  document.querySelectorAll('.fpill.active').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#period-dropdown input').forEach(cb => cb.checked = false);
+  updatePeriodBtn();
+  applySearch();
+});
+
+function hasActiveFilters() {
+  return filterState.periods.size || filterState.genres.size || filterState.genders.size || filterState.query;
+}
+
+function applySearch() {
+  const q   = filterState.query;
+  const res = ALL_RECORDS.filter(r => {
+    if (q && !(r.title      || '').toLowerCase().includes(q) &&
+             !(r.author     || '').toLowerCase().includes(q) &&
+             !(r.translator || '').toLowerCase().includes(q)) return false;
+    if (filterState.periods.size && !filterState.periods.has(r.period)) return false;
+    if (filterState.genres.size  && !filterState.genres.has(r.genre))   return false;
+    if (filterState.genders.size && !filterState.genders.has(r.gender)) return false;
+    return true;
+  });
+
+  if (hasActiveFilters()) {
+    highlightedRecIds  = new Set(res.map(r => r.id));          // per-dot fading
+    highlightedPeriods = new Set(res.filter(r => r.period).map(r => r.period)); // ring label emphasis
+    if (!activeRec) { selectedRing = null; selectedDot = null; showEmpty(); }
+    redraw();
+  } else {
+    highlightedRecIds.clear();
+    highlightedPeriods.clear();
+    redraw();
+  }
+
+  const total = ALL_RECORDS.length;
+  document.getElementById('sp-count').textContent = hasActiveFilters()
+    ? `${res.length.toLocaleString()} of ${total.toLocaleString()} records${res.length > MAX_RESULTS ? ` · showing first ${MAX_RESULTS}` : ''}`
+    : `${total.toLocaleString()} records`;
+  document.getElementById('sp-clear-all').style.display = hasActiveFilters() ? 'inline' : 'none';
+  renderResultCards(res.slice(0, MAX_RESULTS));
+}
+
+function renderResultCards(recs) {
+  document.getElementById('sp-results').innerHTML = recs.map(r => {
+    const col      = GENRE_COLORS[r.genre] || '#AAAAAA';
+    const isActive = activeRec && activeRec.id === r.id;
+    return `<div class="result-card${isActive ? ' active' : ''}" onclick="selectRecord('${r.id}')">
+      <div class="rc-title">${r.title || '—'}</div>
+      <div class="rc-meta">${r.author || '—'} · ${r.year || 'n.d.'}</div>
+      <span class="rc-genre" style="background:${col}22;color:${col};">${r.genre}</span>
+    </div>`;
+  }).join('') || '<div style="font-size:11px;color:rgba(0,0,0,0.35);padding:12px 6px;">No matching records</div>';
+}
+
+function selectRecord(id) {
+  dismissOnboard();
+  activeRec = recordById[id];
+  if (!activeRec) return;
+  selectedRing = activeRec.period;
+  // Highlight the exact dot for this record in the chart
+  selectedDot  = dots.find(d => d.recId === id) || null;
+  highlightedPeriods.clear();
+  redraw();
+  fillSelectedRecord(activeRec);
+  applySearch();
+}
+
+
+/* ═══════════════════════════════════════════
+   ONBOARDING
+═══════════════════════════════════════════ */
+let onboardDismissed = false;
+function dismissOnboard() {
+  if (!onboardDismissed) {
+    onboardDismissed = true;
+    document.getElementById('onboard').classList.add('hidden');
+  }
+}
+setTimeout(() => dismissOnboard(), 7000);
+
+/* ═══════════════════════════════════════════
+   ASYNC INIT — fetch JSON → build everything
+═══════════════════════════════════════════ */
+async function init() {
+  try {
+    const data = await fetch('boslit_ger.json').then(r => r.json());
+
+    ALL_RECORDS = data.records;
+    PERIOD_DATA = data.period_data;
+    STATS       = data.stats;
+    // genre_dist / gender_dist from JSON are [name, count, pct] — keep only [name, pct]
+    GENRE_DIST  = data.genre_dist.map(([name, , pct]) => [name, pct]);
+    GENDER_DIST = data.gender_dist.map(([name, , pct]) => [name, pct]);
+    MAX_CNT     = Math.max(...PERIOD_DATA.map(p => p.count));
+
+    ALL_RECORDS.forEach(r => { recordById[r.id] = r; });
+
+    // Update stat line in search panel header
+    document.getElementById('sp-stats-line').innerHTML =
+      `${STATS.total.toLocaleString()} records <span>· ${STATS.year_min}–${STATS.year_max}</span>`;
+
+    // Update inner void label count
+    document.querySelector('.iv-sub').textContent = `Undated · ${STATS.undated}`;
+
+    buildGeoms();
+    buildDots();
+    buildSearchUI();
+    renderLegend();
+    renderTimeline();
+    redraw();
+
+    document.getElementById('dp-empty').style.display = 'flex';
+    document.getElementById('dp-active').classList.remove('show');
+
+  } catch (err) {
+    console.error('Failed to load boslit_ger.json:', err);
+    document.getElementById('sp-stats-line').innerHTML =
+      '<span style="color:#c00;font-size:11px">⚠ Could not load data — serve via HTTP server</span>';
+  }
+}
+init();
+window.addEventListener('resize', scaleToFit);
+</script>
+</body>
+</html>

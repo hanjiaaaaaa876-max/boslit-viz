@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Language Forest · BOSLIT</title>
+  <link href="https://fonts.googleapis.com/css2?family=ADLaM+Display&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html,body { width:100%;height:100%;overflow:hidden;background:#f2f2f0;
+                font-family:'ADLaM Display',Georgia,serif; }
+    #page {
+      position:absolute;width:1280px;height:832px;
+      background:#fff;transform-origin:top left;overflow:hidden;
+    }
+
+    /* ── TOPBAR ── */
+    #topbar {
+      position:absolute;left:0;top:0;width:1280px;height:54px;
+      display:flex;align-items:center;padding:0 20px;gap:16px;
+      border-bottom:1px solid rgba(0,0,0,0.08);z-index:10;background:#fff;
+    }
+    #back-btn {
+      display:inline-flex;align-items:center;gap:6px;
+      padding:5px 13px 5px 9px;border:1.5px solid #00909B;
+      border-radius:20px;color:#00909B;text-decoration:none;
+      font-size:12px;flex-shrink:0;transition:background .18s,color .18s;
+    }
+    #back-btn:hover { background:#00909B;color:#fff; }
+    #back-btn:hover path { stroke:#fff; }
+    .page-title { font-size:19px;color:#000; }
+    .page-sub   { font-size:10.5px;color:rgba(0,0,0,0.32);margin-top:1px; }
+    .topbar-center { flex:1; }
+    #nav-german {
+      display:inline-flex;align-items:center;gap:6px;
+      padding:5px 14px;border:1.5px solid rgba(0,0,0,0.14);
+      border-radius:20px;color:#555;text-decoration:none;font-size:12px;
+      transition:border-color .15s,color .15s;flex-shrink:0;
+    }
+    #nav-german:hover { border-color:#00909B;color:#00909B; }
+
+    /* ── LEFT PANEL ── */
+    #left-panel {
+      position:absolute;left:0;top:54px;width:268px;height:778px;
+      border-right:1px solid rgba(0,0,0,0.09);
+      display:flex;flex-direction:column;background:#fafaf8;overflow:hidden;
+    }
+    .lp-block { padding:12px 16px 10px;border-bottom:1px solid rgba(0,0,0,0.07);flex-shrink:0; }
+    .lp-label { font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;
+                color:rgba(0,0,0,0.36);margin-bottom:6px; }
+    .lp-stat  { font-size:13px;color:#000; }
+    .lp-stat span { color:rgba(0,0,0,0.36);font-size:11px; }
+
+    /* search */
+    #search-wrap {
+      position:relative;padding:10px 14px 9px;flex-shrink:0;
+      border-bottom:1px solid rgba(0,0,0,0.07);
+    }
+    #search-wrap svg { position:absolute;left:24px;top:50%;transform:translateY(-50%);pointer-events:none; }
+    #search-input {
+      width:100%;padding:8px 28px 8px 32px;
+      border:1.5px solid rgba(0,0,0,0.14);border-radius:20px;
+      font-family:'ADLaM Display',serif;font-size:12px;
+      background:#fff;outline:none;transition:border-color .15s;
+    }
+    #search-input:focus { border-color:#00909B; }
+    #search-clear {
+      position:absolute;right:22px;top:50%;transform:translateY(-50%);
+      background:none;border:none;cursor:pointer;font-size:16px;
+      color:rgba(0,0,0,0.32);display:none;line-height:1;
+    }
+
+    /* pills */
+    .pill-row { display:flex;flex-wrap:wrap;gap:4px; }
+    .fpill {
+      padding:3px 9px;border:1px solid rgba(0,0,0,0.15);border-radius:14px;
+      font-size:10.5px;cursor:pointer;background:#fff;color:#333;
+      transition:all .15s;font-family:'ADLaM Display',serif;
+      display:inline-flex;align-items:center;gap:4px;
+    }
+    .fpill:hover  { border-color:#00909B;color:#00909B; }
+    .fpill.active { background:#0C5F69;color:#fff;border-color:#0C5F69; }
+    .fpill.active .pill-dot { opacity:1;outline:1.5px solid rgba(255,255,255,0.5); }
+    .pill-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0;opacity:0.8; }
+
+    /* volume legend */
+    .vol-row { display:flex;align-items:flex-end;justify-content:space-between;
+               padding-top:4px;width:100%; }
+    .vol-item { display:flex;flex-direction:column;align-items:center;flex:1; }
+    .vdot     { border-radius:50%;background:#1F7A44;opacity:0.55;flex-shrink:0; }
+    .vol-ends { display:flex;justify-content:space-between;margin-top:5px;
+                font-size:8.5px;color:rgba(0,0,0,0.36); }
+    #vol-count-label { margin-top:5px;font-size:9.5px;color:rgba(0,0,0,0.38);
+                       min-height:14px;transition:opacity .15s; }
+
+    /* how to read */
+    .how-row { display:flex;align-items:flex-start;gap:8px;
+               font-size:10.5px;color:rgba(0,0,0,0.52);line-height:1.45;margin-bottom:5px; }
+    .how-row:last-child { margin-bottom:0; }
+    .how-glyph { flex-shrink:0;width:16px;text-align:center;
+                 color:rgba(0,0,0,0.32);font-size:11px;margin-top:0px; }
+    .how-row strong { color:rgba(0,0,0,0.70); }
+
+    /* about + cta */
+    .lp-flex { flex:1;overflow:hidden;display:flex;flex-direction:column; }
+    .lp-about { font-size:10.5px;color:rgba(0,0,0,0.50);line-height:1.58; }
+    #lp-cta {
+      margin:8px 16px 14px;border-radius:10px;padding:11px 14px;flex-shrink:0;
+      background:#f0faf9;border:1px solid rgba(0,144,155,0.22);
+    }
+    #lp-cta p { font-size:10.5px;color:#0C5F69;line-height:1.55; }
+
+    /* ── CHART ── */
+    #chart-wrap { position:absolute;left:268px;top:54px;width:742px;height:778px; }
+    #chart      { display:block; }
+
+    /* tooltip */
+    #tooltip {
+      position:absolute;pointer-events:none;z-index:40;
+      background:rgba(18,28,20,0.93);color:#fff;border-radius:9px;
+      padding:9px 13px;font-size:11px;line-height:1.5;
+      box-shadow:0 4px 18px rgba(0,0,0,0.22);white-space:nowrap;
+      opacity:0;transition:opacity .1s;
+    }
+    #tooltip.show { opacity:1; }
+    .tt-name   { font-size:13px;margin-bottom:1px; }
+    .tt-family { font-size:10px;opacity:0.58;margin-bottom:4px; }
+    .tt-info   { font-size:10.5px;opacity:0.82; }
+
+    /* ── RIGHT PANEL ── */
+    #right-panel {
+      position:absolute;left:1010px;top:54px;width:270px;height:778px;
+      border-left:1px solid rgba(0,0,0,0.09);
+      display:flex;flex-direction:column;background:#fafaf8;overflow:hidden;
+    }
+    .rp-header {
+      padding:14px 18px 11px;border-bottom:1px solid rgba(0,0,0,0.07);
+      font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;
+      color:rgba(0,0,0,0.36);flex-shrink:0;
+    }
+    #rp-empty {
+      flex:1;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;text-align:center;padding:24px;
+    }
+    #rp-empty-glyph { font-size:38px;margin-bottom:12px;opacity:0.22; }
+    #rp-empty-msg   { font-size:11px;color:rgba(0,0,0,0.35);line-height:1.65; }
+    #rp-content     { flex:1;display:none;flex-direction:column;
+                       padding:20px 18px 18px;overflow-y:auto; }
+    #rp-content.show { display:flex; }
+
+    #preview-wrap {
+      width:160px;height:160px;border-radius:50%;overflow:hidden;
+      background:#f3f6f3;align-self:center;margin-bottom:16px;flex-shrink:0;
+    }
+    #preview { display:block; }
+
+    #rp-lang-name { font-size:24px;color:#000;line-height:1.1;margin-bottom:7px; }
+    .family-badge {
+      display:inline-flex;align-items:center;gap:5px;
+      padding:3px 10px 3px 8px;border-radius:12px;border:1.5px solid currentColor;
+      font-size:10px;margin-bottom:16px;
+    }
+    .family-swatch { width:8px;height:8px;border-radius:50%;background:currentColor; }
+
+    .rp-stat-table { width:100%;border-collapse:collapse;margin-bottom:12px; }
+    .rp-stat-table td { padding:4px 0;font-size:11px;vertical-align:top; }
+    .rp-stat-table td:first-child { color:rgba(0,0,0,0.4);width:50%;padding-right:4px; }
+    .rp-stat-table td:last-child  { color:#000;font-size:11.5px; }
+    hr.rp-div { border:none;border-top:1px solid rgba(0,0,0,0.07);margin:11px 0; }
+
+    .rp-sub-label { font-size:9.5px;letter-spacing:0.07em;text-transform:uppercase;
+                    color:rgba(0,0,0,0.36);margin-bottom:5px; }
+    .genre-badge {
+      display:inline-block;padding:3px 10px;border-radius:12px;
+      font-size:10.5px;background:#e8f5e9;color:#2E7D32;margin-bottom:14px;
+    }
+    #gender-bar-wrap {
+      height:10px;border-radius:5px;overflow:hidden;
+      background:#eee;display:flex;margin-bottom:5px;
+    }
+    #g-male   { background:#6EB5D4;height:100%; }
+    #g-female { background:#F4A7B9;height:100%; }
+    #g-unk    { background:#BBBBBB;height:100%; }
+    #gender-text {
+      display:flex;justify-content:space-between;
+      font-size:9.5px;color:rgba(0,0,0,0.4);margin-bottom:16px;
+    }
+    #explore-btn {
+      display:block;text-align:center;padding:11px 16px;
+      background:#00909B;color:#fff;text-decoration:none;
+      border-radius:22px;font-size:13px;border:none;cursor:pointer;
+      font-family:'ADLaM Display',serif;transition:background .18s;margin-top:auto;
+    }
+    #explore-btn:hover { background:#007A84; }
+  </style>
+</head>
+<body>
+<div id="page">
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <a href="index.html" id="back-btn">
+      <svg viewBox="0 0 12 12" fill="none" width="12" height="12">
+        <path d="M8 2L4 6L8 10" stroke="#00909B" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Intro
+    </a>
+    <div class="topbar-center">
+      <div class="page-title">Language Forest</div>
+      <div class="page-sub" id="page-sub">Loading…</div>
+    </div>
+    <a href="german.html" id="nav-german">German in Translation →</a>
+  </div>
+
+  <!-- LEFT PANEL -->
+  <div id="left-panel">
+    <div class="lp-block">
+      <div class="lp-label">Explore Languages</div>
+      <div class="lp-stat" id="lp-stat">— <span>languages</span></div>
+    </div>
+
+    <div id="search-wrap">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+        <circle cx="5.5" cy="5.5" r="4" stroke="rgba(0,0,0,0.28)" stroke-width="1.4"/>
+        <path d="M9 9L11.5 11.5" stroke="rgba(0,0,0,0.28)" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <input id="search-input" type="text" placeholder="Search languages…" autocomplete="off">
+      <button id="search-clear">×</button>
+    </div>
+
+    <div class="lp-block">
+      <div class="lp-label">Language Family</div>
+      <div class="pill-row" id="family-pills"></div>
+    </div>
+
+    <div class="lp-block">
+      <div class="lp-label">Records per Language</div>
+      <div class="pill-row" id="volume-pills"></div>
+      <div id="vol-count-label"></div>
+    </div>
+
+    <div class="lp-block">
+      <div class="lp-label">Circle Size Guide</div>
+      <div class="vol-row">
+        <div class="vol-item"><div class="vdot" style="width:7px;height:7px;"></div></div>
+        <div class="vol-item"><div class="vdot" style="width:13px;height:13px;"></div></div>
+        <div class="vol-item"><div class="vdot" style="width:22px;height:22px;"></div></div>
+        <div class="vol-item"><div class="vdot" style="width:33px;height:33px;"></div></div>
+        <div class="vol-item"><div class="vdot" style="width:46px;height:46px;"></div></div>
+      </div>
+      <div class="vol-ends"><span>fewer</span><span>more</span></div>
+    </div>
+
+    <div class="lp-block">
+      <div class="lp-label">How to Read This View</div>
+      <div style="margin-top:2px;">
+        <div class="how-row">
+          <span class="how-glyph">↕</span>
+          <span><strong>Vertical position</strong> — earliest known translation into English</span>
+        </div>
+        <div class="how-row">
+          <span class="how-glyph">⬤</span>
+          <span><strong>Circle size</strong> — total number of translation records</span>
+        </div>
+        <div class="how-row">
+          <span class="how-glyph">▐</span>
+          <span><strong>Column</strong> — language family (primary identifier)</span>
+        </div>
+        <div class="how-row">
+          <span class="how-glyph">🎨</span>
+          <span><strong>Colour</strong> — family identity (secondary cue)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="lp-flex">
+      <div class="lp-block" style="flex:1;overflow:hidden;">
+        <div class="lp-label">About This View</div>
+        <p class="lp-about">
+          Each circle is a source language in the BOSLIT dataset.
+          A beeswarm layout preserves the time axis while guaranteeing
+          every language — even those with few records — has its own
+          visible, clickable space.
+        </p>
+      </div>
+      <div id="lp-cta">
+        <p>Click any language to explore its statistics. German has a full tree-ring detail view.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHART -->
+  <div id="chart-wrap">
+    <canvas id="chart" width="742" height="778"></canvas>
+    <div id="tooltip">
+      <div class="tt-name"   id="tt-name"></div>
+      <div class="tt-family" id="tt-family"></div>
+      <div class="tt-info"   id="tt-info"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="right-panel">
+    <div class="rp-header">Selected Language</div>
+    <div id="rp-empty">
+      <div id="rp-empty-glyph">🌿</div>
+      <div id="rp-empty-msg">Click a language bubble to explore its translation history and statistics.</div>
+    </div>
+    <div id="rp-content">
+      <div id="preview-wrap"><canvas id="preview" width="160" height="160"></canvas></div>
+      <div id="rp-lang-name"></div>
+      <span class="family-badge" id="rp-fam-badge">
+        <span class="family-swatch" id="rp-fam-swatch"></span>
+        <span id="rp-fam-text"></span>
+      </span>
+      <table class="rp-stat-table" id="rp-stats"></table>
+      <hr class="rp-div">
+      <div class="rp-sub-label">Dominant Genre</div>
+      <span class="genre-badge" id="rp-genre"></span>
+      <div class="rp-sub-label">Author Gender</div>
+      <div id="gender-bar-wrap">
+        <div id="g-male"></div><div id="g-female"></div><div id="g-unk"></div>
+      </div>
+      <div id="gender-text">
+        <span id="gt-m"></span><span id="gt-f"></span><span id="gt-u"></span>
+      </div>
+      <!-- Only shown for German -->
+      <button id="explore-btn" style="display:none" onclick="window.location.href='german.html'">
+        Explore German in Translation →
+      </button>
+    </div>
+  </div>
+
+</div>
+<script>
+/* ═══════════════════════════════════════════════
+   Language Forest — real data, beeswarm layout
+═══════════════════════════════════════════════ */
+
+// ── Seeded LCG RNG ────────────────────────────
+function mkRand(seed) {
+  let s = seed >>> 0;
+  return () => { s = Math.imul(1664525,s)+1013904223>>>0; return s/4294967296; };
+}
+
+// ── Family colours ────────────────────────────
+// Position (column) = primary encoding; colour = visual enhancement
+const FAM_ACCENT = {
+  'Germanic':   '#1F7A44',
+  'Romance':    '#B87D0A',
+  'Slavic':     '#1A52A8',
+  'East Asian': '#C03818',
+  'Celtic':     '#7A1AA0',
+  'Other':      '#008890',
+};
+
+// Particle palettes: [dark … light] applied centre-out
+const PALETTES = {
+  'Germanic':   [[15,72,36],[30,108,60],[52,135,82],[90,162,110],[138,190,148]],
+  'Romance':    [[95,68,8],[142,102,18],[175,138,42],[205,172,88],[228,206,136]],
+  'Slavic':     [[18,50,125],[34,78,162],[60,108,192],[96,146,216],[143,183,232]],
+  'East Asian': [[135,36,18],[175,60,30],[202,96,54],[224,136,96],[238,176,146]],
+  'Celtic':     [[88,16,138],[120,34,172],[152,66,202],[186,112,222],[214,160,236]],
+  'Other':      [[0,92,105],[10,125,132],[36,155,160],[78,182,186],[128,208,210]],
+};
+
+// ── Layout ────────────────────────────────────
+const CW = 742, CH = 778;
+const AXIS_X  = 68;
+const PLOT_X0 = 82;
+const PLOT_X1 = CW - 4;
+const PLOT_Y0 = 54;
+const PLOT_Y1 = 750;
+const YEAR_MIN = 1380, YEAR_MAX = 2025;
+const FAMILIES = ['Germanic','Romance','Slavic','East Asian','Celtic','Other'];
+const COL_W    = (PLOT_X1 - PLOT_X0) / FAMILIES.length;
+
+function yearToY(yr) {
+  const y = Math.max(YEAR_MIN, Math.min(YEAR_MAX, yr || YEAR_MAX));
+  return PLOT_Y0 + (y - YEAR_MIN) / (YEAR_MAX - YEAR_MIN) * (PLOT_Y1 - PLOT_Y0);
+}
+function colCX(fam) {
+  const i = FAMILIES.indexOf(fam); if (i < 0) return PLOT_X0 + COL_W * 5.5;
+  return PLOT_X0 + (i + 0.5) * COL_W;
+}
+
+let MAX_COUNT = 1;
+function countToR(c) {
+  return Math.max(5, Math.min(60, Math.pow(c / MAX_COUNT, 0.38) * 60));
+}
+
+// ── Particle rendering ────────────────────────
+const circleCache = new Map();
+function getCircleImg(fam, r, seed) {
+  const key = `${fam}|${Math.round(r)}|${seed}`;
+  if (circleCache.has(key)) return circleCache.get(key);
+  const sz = (r + 2) * 2;
+  const oc  = new OffscreenCanvas(sz, sz);
+  drawParticles(oc.getContext('2d'), sz/2, sz/2, r, fam, seed);
+  circleCache.set(key, oc);
+  return oc;
+}
+function drawParticles(pctx, cx, cy, r, fam, seed) {
+  const pal  = PALETTES[fam] || PALETTES['Other'];
+  const rand = mkRand(seed);
+  const n    = Math.max(18, Math.min(380, Math.floor(r * r * 0.44)));
+  for (let i = 0; i < n; i++) {
+    const angle    = rand() * Math.PI * 2;
+    const distFrac = Math.sqrt(rand());
+    const dist     = distFrac * r;
+    const px = cx + dist * Math.cos(angle);
+    const py = cy + dist * Math.sin(angle);
+    const ci = Math.min(4, Math.floor((1 - distFrac) * 3 + rand() * 2));
+    const [rv,gv,bv] = pal[ci];
+    const a  = (0.52 + rand() * 0.48) * (1 - distFrac * 0.44);
+    const pr = 0.5 + rand() * 1.2;
+    pctx.beginPath(); pctx.arc(px, py, pr, 0, Math.PI*2);
+    pctx.fillStyle = `rgba(${rv},${gv},${bv},${a})`; pctx.fill();
+  }
+}
+
+// ── Build + beeswarm ──────────────────────────
+let ALL_LANGS = [], circles = [];
+
+function buildCircles() {
+  circles = ALL_LANGS.map((lang, i) => {
+    const r   = countToR(lang.count);
+    const cx0 = colCX(lang.family);
+    const cy0 = yearToY(lang.earliest);
+    // Seeded initial X spread — breaks symmetry for beeswarm
+    const rng    = mkRand(i * 31337 + 91);
+    const spread = (rng() - 0.5) * COL_W * 0.55;
+    return { lang, r, cx: cx0 + spread, cy: cy0, cx0, cy0,
+             seed: i * 12345 + 7, family: lang.family };
+  });
+  beeswarm(circles, 280);
+}
+
+function beeswarm(cs, iters) {
+  for (let it = 0; it < iters; it++) {
+    for (let i = 0; i < cs.length; i++) {
+      const a = cs[i];
+      for (let j = i+1; j < cs.length; j++) {
+        const b = cs[j];
+        if (a.family !== b.family) continue;
+        const dx   = b.cx - a.cx, dy = b.cy - a.cy;
+        const dist = Math.hypot(dx, dy) || 0.01;
+        const gap  = a.r + b.r + 3;
+        if (dist < gap) {
+          const f  = (gap - dist) / dist * 0.42;
+          // Key beeswarm principle: push horizontally 4× more than vertically
+          const fx = dx * f, fy = dy * f * 0.25;
+          a.cx -= fx*0.5; a.cy -= fy*0.5;
+          b.cx += fx*0.5; b.cy += fy*0.5;
+        }
+      }
+      // Strong Y spring → circles stay near their true time position
+      a.cy += (a.cy0 - a.cy) * 0.18;
+      // Weak X spring → allow wide horizontal scatter
+      a.cx += (a.cx0 - a.cx) * 0.022;
+      // Hard column + plot bounds
+      const hw = COL_W * 0.50 - 2;
+      a.cx = Math.max(a.cx0 - hw, Math.min(a.cx0 + hw, a.cx));
+      a.cy = Math.max(PLOT_Y0 + a.r + 1, Math.min(PLOT_Y1 - a.r - 1, a.cy));
+    }
+  }
+}
+
+// ── State ─────────────────────────────────────
+const canvas  = document.getElementById('chart');
+const ctx     = canvas.getContext('2d');
+const pCanvas = document.getElementById('preview');
+const pCtx    = pCanvas.getContext('2d');
+let hoveredC  = null, selectedC = null;
+let activeFamily = null, activeVolume = null, searchQ = '';
+
+const VOLUME_BRACKETS = [
+  { label: '≤ 10',     min: 0,   max: 10  },
+  { label: '11–100',   min: 11,  max: 100 },
+  { label: '101–500',  min: 101, max: 500 },
+  { label: '500+',     min: 501, max: Infinity },
+];
+
+// ── Render ────────────────────────────────────
+function render() {
+  ctx.clearRect(0, 0, CW, CH);
+
+  // Year grid lines
+  const gridYears = [1500, 1600, 1700, 1800, 1900, 2000];
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,0,0,0.052)'; ctx.lineWidth = 1;
+  for (const yr of gridYears) {
+    const y = yearToY(yr);
+    ctx.beginPath(); ctx.moveTo(AXIS_X, y); ctx.lineTo(CW, y); ctx.stroke();
+  }
+  ctx.restore();
+
+  // Column subtle bands (alternating)
+  ctx.save();
+  for (let i = 0; i < FAMILIES.length; i++) {
+    if (i % 2 === 1) {
+      ctx.fillStyle = 'rgba(0,0,0,0.012)';
+      ctx.fillRect(PLOT_X0 + i * COL_W, PLOT_Y0 - 4, COL_W, PLOT_Y1 - PLOT_Y0 + 8);
+    }
+  }
+  ctx.restore();
+
+  // Vertical time axis
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,0,0,0.14)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(AXIS_X, PLOT_Y0-8); ctx.lineTo(AXIS_X, PLOT_Y1+6); ctx.stroke();
+  ctx.beginPath(); // arrowhead
+  ctx.moveTo(AXIS_X-4,PLOT_Y0-2); ctx.lineTo(AXIS_X,PLOT_Y0-10); ctx.lineTo(AXIS_X+4,PLOT_Y0-2);
+  ctx.stroke();
+  ctx.restore();
+
+  // Year labels + ticks
+  ctx.save();
+  ctx.font = '10px "ADLaM Display",Georgia,serif';
+  ctx.fillStyle = 'rgba(0,0,0,0.32)';
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (const yr of gridYears) {
+    const y = yearToY(yr);
+    ctx.fillText(yr, AXIS_X-8, y);
+    ctx.beginPath();
+    ctx.strokeStyle='rgba(0,0,0,0.18)'; ctx.lineWidth=1;
+    ctx.moveTo(AXIS_X-4,y); ctx.lineTo(AXIS_X,y); ctx.stroke();
+  }
+  ctx.restore();
+
+  // Column headers
+  ctx.save();
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  for (let i = 0; i < FAMILIES.length; i++) {
+    const fam  = FAMILIES[i];
+    const x    = PLOT_X0 + (i + 0.5) * COL_W;
+    const dim  = activeFamily && activeFamily !== fam;
+    ctx.font      = `${dim ? 10 : 11}px "ADLaM Display",Georgia,serif`;
+    ctx.fillStyle = dim ? 'rgba(0,0,0,0.18)' : FAM_ACCENT[fam];
+    ctx.fillText(fam, x, PLOT_Y0 - 12);
+  }
+  ctx.restore();
+
+  // ── Circles ───────────────────────────────────────────────────────────
+  // Render order: LARGE first (bottom), SMALL last (always on top).
+  // Hit detection reverses this: SMALL first (prioritised).
+  const bySize = [...circles].sort((a,b) => b.r - a.r);
+  const hasSearch = !!searchQ;
+  const hasFam    = !!activeFamily;
+  const hasVol    = !!activeVolume;
+
+  for (const c of bySize) {
+    const isSel      = c === selectedC;
+    const isHov      = c === hoveredC;
+    const nameMatch  = hasSearch && c.lang.name.toLowerCase().includes(searchQ);
+    const famMatch   = hasFam && c.family === activeFamily;
+    const volMatch   = hasVol && c.lang.count >= activeVolume.min && c.lang.count <= activeVolume.max;
+
+    let alpha = 1.0;
+    if (hasFam    && !famMatch)  alpha = 0.10;
+    if (hasVol    && !volMatch)  alpha = Math.min(alpha, 0.10);
+    if (hasSearch && !nameMatch) alpha = Math.min(alpha, 0.10);
+    if (selectedC && !isSel && !hasSearch && !hasFam && !hasVol) alpha = 0.38;
+
+    const img = getCircleImg(c.family, c.r, c.seed);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(img, c.cx - img.width/2, c.cy - img.height/2);
+    ctx.restore();
+
+    if (isHov && !isSel) {
+      ctx.save();
+      ctx.beginPath(); ctx.arc(c.cx, c.cy, c.r+3.5, 0, Math.PI*2);
+      ctx.strokeStyle='rgba(0,0,0,0.28)'; ctx.lineWidth=1.5;
+      ctx.setLineDash([3,2]); ctx.stroke(); ctx.restore();
+    }
+    if (isSel) {
+      ctx.save();
+      ctx.beginPath(); ctx.arc(c.cx, c.cy, c.r+5, 0, Math.PI*2);
+      ctx.strokeStyle = FAM_ACCENT[c.family]; ctx.lineWidth = 2;
+      ctx.setLineDash([]); ctx.stroke(); ctx.restore();
+    }
+    // Name label for larger circles when not searching
+    if (c.r > 22 && alpha > 0.35 && !hasSearch) {
+      ctx.save();
+      ctx.font = '9px "ADLaM Display",Georgia,serif';
+      ctx.fillStyle = `rgba(0,0,0,${(alpha*0.45).toFixed(2)})`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText(c.lang.name, c.cx, c.cy + c.r + 4);
+      ctx.restore();
+    }
+  }
+}
+
+// ── Hit detection: SMALL circles get priority ─
+// Returns true only if this circle is currently highlighted (not dimmed)
+function isHighlighted(c) {
+  if (activeFamily && c.family !== activeFamily) return false;
+  if (activeVolume && (c.lang.count < activeVolume.min || c.lang.count > activeVolume.max)) return false;
+  if (searchQ && !c.lang.name.toLowerCase().includes(searchQ)) return false;
+  return true;
+}
+
+// Finds nearest circle (small-first priority), regardless of highlight state
+function circleAt(mx, my) {
+  const bySmall = [...circles].sort((a,b) => a.r - b.r);
+  for (const c of bySmall) {
+    const hit = Math.max(c.r, 12);
+    if (Math.hypot(mx - c.cx, my - c.cy) <= hit + 4) return c;
+  }
+  return null;
+}
+
+// ── Tooltip ───────────────────────────────────
+const tooltip = document.getElementById('tooltip');
+function showTT(c, ex, ey) {
+  const l = c.lang;
+  document.getElementById('tt-name').textContent   = l.name;
+  document.getElementById('tt-family').textContent = l.family;
+  const span = (l.earliest && l.latest)
+    ? `${l.earliest}–${l.latest}` : 'dates unknown';
+  document.getElementById('tt-info').textContent =
+    `${l.count.toLocaleString()} records · ${span}`;
+  tooltip.style.left = (ex + 14) + 'px';
+  tooltip.style.top  = (ey - 18) + 'px';
+  tooltip.classList.add('show');
+}
+function hideTT() { tooltip.classList.remove('show'); }
+
+// ── Mouse events ──────────────────────────────
+canvas.addEventListener('mousemove', e => {
+  const rect  = canvas.getBoundingClientRect();
+  const scale = rect.width / CW;
+  const mx = (e.clientX - rect.left) / scale;
+  const my = (e.clientY - rect.top)  / scale;
+  const anyHit = circleAt(mx, my);
+  const active = (anyHit && isHighlighted(anyHit)) ? anyHit : null;
+  if (active !== hoveredC) {
+    hoveredC = active;
+    canvas.style.cursor = active ? 'pointer' : 'default';
+    render();
+  }
+  if (active) showTT(active, e.clientX - rect.left, e.clientY - rect.top);
+  else hideTT();
+});
+canvas.addEventListener('mouseleave', () => { hoveredC=null; hideTT(); render(); });
+canvas.addEventListener('click', e => {
+  const rect  = canvas.getBoundingClientRect();
+  const scale = rect.width / CW;
+  const mx = (e.clientX - rect.left) / scale;
+  const my = (e.clientY - rect.top)  / scale;
+  const anyHit = circleAt(mx, my);
+  if (!anyHit) {
+    // Hit empty canvas → clear selection
+    selectedC = null; render(); showEmpty();
+  } else if (isHighlighted(anyHit)) {
+    // Hit a highlighted circle → select it
+    selectedC = anyHit; render(); fillRight(anyHit);
+  }
+  // Hit a dimmed circle → no-op
+});
+
+// ── Right panel ───────────────────────────────
+function showEmpty() {
+  document.getElementById('rp-empty').style.display   = '';
+  document.getElementById('rp-content').classList.remove('show');
+}
+function fillRight(c) {
+  const l = c.lang;
+  document.getElementById('rp-empty').style.display = 'none';
+  document.getElementById('rp-content').classList.add('show');
+
+  // Preview circle
+  pCtx.clearRect(0, 0, 160, 160);
+  const pseed = l.code.split('').reduce((a,ch)=>a+ch.charCodeAt(0)*137,0);
+  drawParticles(pCtx, 80, 80, 72, l.family, pseed);
+
+  document.getElementById('rp-lang-name').textContent = l.name;
+
+  const accent = FAM_ACCENT[l.family] || '#555';
+  const badge  = document.getElementById('rp-fam-badge');
+  badge.style.color = accent;
+  document.getElementById('rp-fam-swatch').style.background = accent;
+  document.getElementById('rp-fam-text').textContent = l.family;
+
+  const early = l.earliest || '—', late = l.latest || '—';
+  const span  = (l.earliest && l.latest) ? `${l.latest - l.earliest} yrs` : '—';
+  document.getElementById('rp-stats').innerHTML = `
+    <tr><td>Total records</td><td>${l.count.toLocaleString()}</td></tr>
+    <tr><td>Earliest</td><td>${early}</td></tr>
+    <tr><td>Latest</td><td>${late}</td></tr>
+    <tr><td>Time span</td><td>${span}</td></tr>`;
+
+  document.getElementById('rp-genre').textContent = l.top_genre || '—';
+
+  const m = l.male_pct, f = l.female_pct, u = Math.max(0, 1-m-f);
+  document.getElementById('g-male').style.width   = (m*100).toFixed(1)+'%';
+  document.getElementById('g-female').style.width = (f*100).toFixed(1)+'%';
+  document.getElementById('g-unk').style.width    = (u*100).toFixed(1)+'%';
+  document.getElementById('gt-m').textContent = `♂ ${(m*100).toFixed(0)}%`;
+  document.getElementById('gt-f').textContent = `♀ ${(f*100).toFixed(0)}%`;
+  document.getElementById('gt-u').textContent = `? ${(u*100).toFixed(0)}%`;
+
+  // Explore button only for German
+  const btn = document.getElementById('explore-btn');
+  btn.style.display = l.code === 'ger' ? 'block' : 'none';
+}
+
+// ── Family filter pills ───────────────────────
+function buildPills() {
+  const wrap = document.getElementById('family-pills');
+  wrap.innerHTML = '';
+  ['All', ...FAMILIES].forEach(f => {
+    const b = document.createElement('button');
+    b.className = 'fpill' + (f==='All' ? ' active' : '');
+    b.dataset.fam = f;
+    if (f !== 'All') {
+      const dot = document.createElement('span');
+      dot.className = 'pill-dot';
+      dot.style.background = FAM_ACCENT[f];
+      b.appendChild(dot);
+    }
+    b.appendChild(document.createTextNode(f));
+    b.addEventListener('click', () => {
+      wrap.querySelectorAll('.fpill').forEach(p => p.classList.remove('active'));
+      b.classList.add('active');
+      activeFamily = f === 'All' ? null : f;
+      render();
+    });
+    wrap.appendChild(b);
+  });
+}
+
+// ── Volume filter pills ───────────────────────
+function buildVolumePills() {
+  const wrap  = document.getElementById('volume-pills');
+  const label = document.getElementById('vol-count-label');
+  wrap.innerHTML = '';
+
+  const allBtn = document.createElement('button');
+  allBtn.className = 'fpill active';
+  allBtn.textContent = 'All';
+  allBtn.addEventListener('click', () => {
+    wrap.querySelectorAll('.fpill').forEach(p => p.classList.remove('active'));
+    allBtn.classList.add('active');
+    activeVolume = null;
+    label.textContent = '';
+    render();
+  });
+  wrap.appendChild(allBtn);
+
+  VOLUME_BRACKETS.forEach(br => {
+    const n = ALL_LANGS.filter(l => l.count >= br.min && l.count <= br.max).length;
+    const b = document.createElement('button');
+    b.className = 'fpill';
+    b.textContent = br.label;
+    b.addEventListener('click', () => {
+      wrap.querySelectorAll('.fpill').forEach(p => p.classList.remove('active'));
+      b.classList.add('active');
+      activeVolume = br;
+      label.textContent = `${n} language${n !== 1 ? 's' : ''}`;
+      render();
+    });
+    wrap.appendChild(b);
+  });
+}
+
+// ── Search ────────────────────────────────────
+document.getElementById('search-input').addEventListener('input', function() {
+  searchQ = this.value.trim().toLowerCase();
+  document.getElementById('search-clear').style.display = searchQ ? 'block' : 'none';
+  render();
+});
+document.getElementById('search-clear').addEventListener('click', () => {
+  document.getElementById('search-input').value = '';
+  searchQ = '';
+  document.getElementById('search-clear').style.display = 'none';
+  render();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('search-input').value = '';
+    searchQ = '';
+    document.getElementById('search-clear').style.display = 'none';
+    render();
+  }
+});
+
+// ── Responsive scale ──────────────────────────
+function rescale() {
+  const s = Math.min(window.innerWidth/1280, window.innerHeight/832);
+  document.getElementById('page').style.transform = `scale(${s})`;
+}
+window.addEventListener('resize', rescale);
+rescale();
+
+// ── Init: load real data ──────────────────────
+async function init() {
+  const data = await fetch('boslit_languages.json').then(r => r.json());
+  ALL_LANGS  = data.languages;
+  MAX_COUNT  = Math.max(...ALL_LANGS.map(l => l.count));
+
+  const totalRecords = ALL_LANGS.reduce((s,l) => s+l.count, 0);
+  document.getElementById('lp-stat').innerHTML =
+    `${data.total} <span>languages · ${totalRecords.toLocaleString()} records</span>`;
+  document.getElementById('page-sub').textContent =
+    `${data.total} languages across five centuries of Scottish literature in translation`;
+
+  buildCircles();
+  buildPills();
+  buildVolumePills();
+
+  // Pre-render all circles before first paint
+  circles.forEach(c => getCircleImg(c.family, c.r, c.seed));
+  render();
+
+  // Auto-select German
+  const ger = circles.find(c => c.lang.code === 'ger');
+  if (ger) { selectedC = ger; render(); fillRight(ger); }
+}
+
+init().catch(err => {
+  document.getElementById('page-sub').textContent = 'Error loading data: ' + err.message;
+});
+</script>
+</body>
+</html>

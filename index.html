@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scottish Literature in Translation</title>
+  <link href="https://fonts.googleapis.com/css2?family=ADLaM+Display&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #060e05; overflow: hidden; font-family: 'ADLaM Display', Georgia, serif; }
+
+    #bg-img {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; z-index: 0; opacity: 0.45;
+    }
+    #c { position: fixed; inset: 0; z-index: 1; }
+
+    /* vignette */
+    #vig {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 55%,
+        transparent 38%, rgba(3,8,2,0.50) 100%);
+    }
+
+    /* loading */
+    #loading {
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 1rem;
+      background: #060e05; color: rgba(200,215,165,0.65);
+      transition: opacity 1.4s ease;
+    }
+    #loading .lbl  { font-size: 0.72rem; letter-spacing: 0.38em; text-transform: uppercase; }
+    #loading .track { width: 140px; height: 1px; background: rgba(200,215,165,0.15); }
+    #loading .fill  { height: 100%; background: rgba(175,215,120,0.5); width: 0%; transition: width 0.15s; }
+    #loading.gone   { opacity: 0; pointer-events: none; }
+
+    /* title */
+    #ui {
+      position: fixed; bottom: 9%; left: 50%; transform: translateX(-50%);
+      text-align: center; z-index: 2; pointer-events: none; user-select: none;
+      opacity: 0; transition: opacity 2.2s ease 0.6s;
+    }
+    #ui.show { opacity: 1; }
+    #ui h1 {
+      font-size: clamp(1.4rem, 3vw, 2.2rem); font-weight: normal;
+      color: #ffffff;
+      letter-spacing: 0.08em;
+      text-shadow: 0 2px 18px rgba(0,0,0,0.85), 0 0 40px rgba(0,0,0,0.6);
+    }
+    #ui .desc {
+      margin: 0.75rem auto 0;
+      font-size: clamp(0.75rem, 1.4vw, 0.95rem);
+      color: rgba(255,255,255,0.82);
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      line-height: 1.6;
+      text-align: center;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.9);
+      max-width: 480px;
+    }
+    #ui .sub {
+      margin-top: 0.5rem; font-size: clamp(0.62rem,1.1vw,0.8rem);
+      color: rgba(255,255,255,0.55);
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+    }
+    #ui .hint {
+      margin-top: 1.8rem; font-size: clamp(0.6rem,1vw,0.75rem);
+      color: rgba(255,255,255,0.65);
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+      animation: pulse 3.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:.22} 50%{opacity:.75} }
+  </style>
+</head>
+<body>
+
+  <img id="bg-img" src="background.png" alt="">
+  <canvas id="c"></canvas>
+  <div id="vig"></div>
+
+  <div id="loading">
+    <span class="lbl">Loading forest &nbsp;<span id="pct">0%</span></span>
+    <div class="track"><div class="fill" id="bar"></div></div>
+  </div>
+
+  <div id="ui">
+    <h1>Visualising Scottish Literature in Translation</h1>
+    <p class="desc">An interactive exploration of 32,607 translation records<br>across 145 languages and five centuries of publishing history.</p>
+    <p class="sub">BOSLIT · National Library of Scotland</p>
+    <a class="hint" href="language.html" style="color:inherit;text-decoration:none;cursor:pointer;pointer-events:auto;">↓ &nbsp; Explore the Dataset</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+  <script>
+  /* ═══════════════════════════════════════════════════════════════
+     VGGT point cloud — forest path
+     Coordinate system (from GLB analysis):
+       X left/right · Y up (flipped) · Z forward along path (0.25→5.89)
+     Walk: static 2 s → slow walk → freeze at 8 s
+  ═══════════════════════════════════════════════════════════════ */
+
+  const renderer = new THREE.WebGLRenderer({
+    canvas: document.getElementById('c'), antialias: true, alpha: true
+  });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x000000, 0);
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(
+    70, window.innerWidth / window.innerHeight, 0.005, 200
+  );
+
+  // background.png rendered as HTML img behind the canvas (opacity controlled via CSS)
+
+  // ── Shader ─────────────────────────────────────────────────────
+  const VS = `
+    attribute vec3 aColor;
+    varying   vec3 vColor;
+    varying   float vFog, vNear;
+    uniform   float uFogNear, uFogFar, uNearFade;
+    void main() {
+      vColor = aColor;
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      gl_Position = projectionMatrix * mv;
+      float d = -mv.z;
+      vFog  = smoothstep(uFogNear, uFogFar, d);
+      vNear = smoothstep(0.0, uNearFade, d);
+      gl_PointSize = clamp(2.8 / d, 1.0, 5.0);
+    }
+  `;
+  const FS = `
+    precision highp float;
+    varying vec3 vColor; varying float vFog, vNear;
+    uniform vec3 uFogColor;
+    void main() {
+      vec2 uv = gl_PointCoord - 0.5;
+      if (dot(uv,uv) > 0.25) discard;
+      vec3  col   = mix(vColor, uFogColor, vFog);
+      float alpha = (1.0 - vFog) * vNear;
+      gl_FragColor = vec4(col, alpha);
+    }
+  `;
+
+  const mat = new THREE.ShaderMaterial({
+    vertexShader: VS, fragmentShader: FS,
+    uniforms: {
+      uFogNear:  { value: 2.5 },
+      uFogFar:   { value: 5.8 },
+      uNearFade: { value: 0.08 },
+      uFogColor: { value: new THREE.Color(0x0a1a07) }
+    },
+    transparent: true, depthWrite: false
+  });
+
+  // ── GLB parser ─────────────────────────────────────────────────
+  async function loadGLBPoints(url, every = 15) {
+    const res   = await fetch(url);
+    const bytes = parseInt(res.headers.get('content-length') || '0');
+    const pctEl = document.getElementById('pct');
+    const barEl = document.getElementById('bar');
+
+    const reader = res.body.getReader();
+    const chunks = []; let got = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value); got += value.length;
+      if (bytes) { const p = Math.round(got/bytes*100); pctEl.textContent=p+'%'; barEl.style.width=p+'%'; }
+    }
+    const buf = new ArrayBuffer(got);
+    const tmp = new Uint8Array(buf);
+    let off = 0; for (const c of chunks) { tmp.set(c,off); off+=c.length; }
+
+    const dv   = new DataView(buf);
+    const jlen = dv.getUint32(12, true);
+    const gltf = JSON.parse(new TextDecoder().decode(new Uint8Array(buf, 20, jlen)));
+    const bin  = 20 + jlen + 8;
+
+    let prim = null;
+    for (const mesh of gltf.meshes) {
+      for (const p of mesh.primitives) { if ((p.mode??4)===0){prim=p;break;} }
+      if (prim) break;
+    }
+    if (!prim) throw new Error('No POINTS mesh in GLB');
+
+    const posAcc = gltf.accessors[prim.attributes.POSITION];
+    const colAcc = gltf.accessors[prim.attributes.COLOR_0];
+    const posBv  = gltf.bufferViews[posAcc.bufferView];
+    const colBv  = gltf.bufferViews[colAcc.bufferView];
+    const count  = posAcc.count;
+    const n      = Math.ceil(count / every);
+
+    const srcPos = new Float32Array(buf, bin+(posBv.byteOffset||0), count*3);
+    const srcCol = new Uint8Array(  buf, bin+(colBv.byteOffset||0), count*4);
+    const oPos   = new Float32Array(n*3);
+    const oCol   = new Float32Array(n*3);
+
+    let k = 0;
+    for (let i = 0; i < count && k < n; i += every) {
+      oPos[k*3]=srcPos[i*3]; oPos[k*3+1]=srcPos[i*3+1]; oPos[k*3+2]=srcPos[i*3+2];
+      oCol[k*3]=srcCol[i*4]/255; oCol[k*3+1]=srcCol[i*4+1]/255; oCol[k*3+2]=srcCol[i*4+2]/255;
+      k++;
+    }
+    return { pos: oPos.slice(0,k*3), col: oCol.slice(0,k*3), count: k };
+  }
+
+  // ── Camera constants (from GLB analysis) ───────────────────────
+  const CAM_START_Z = 0.10;
+  const CAM_END_Z   = 5.40;
+  const EYE_Y       =  0.05;
+  const LOOK_Y      =  0.12;
+
+  // Walk: 2 s static + 8 s walk then freeze
+  // walkT increases at 0.00055/frame ≈ 0.033/s
+  // 8 s of walking → walkT_max ≈ 0.033 × 8 = 0.264
+  const WALK_MAX_T  = 0.165;   // freeze at ~5 s of walking
+
+  let walkT   = 0;
+  let gt      = 0;
+  let walking = false;
+  let frozen  = false;
+
+  camera.position.set(0, EYE_Y, CAM_START_Z);
+  camera.lookAt(0, LOOK_Y, CAM_END_Z);
+
+  // ── Main ───────────────────────────────────────────────────────
+  (async () => {
+    try {
+      const { pos, col, count } = await loadGLBPoints('forest.glb', 15);
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute('aColor',   new THREE.BufferAttribute(col, 3));
+
+      const cloud = new THREE.Points(geo, mat);
+      cloud.scale.set(1, -1, 1);   // flip Y: VGGT Y is inverted
+      scene.add(cloud);
+
+      console.log(`${count.toLocaleString()} pts · walk freezes at 8 s`);
+
+      document.getElementById('loading').classList.add('gone');
+      setTimeout(() => document.getElementById('ui').classList.add('show'), 600);
+      setTimeout(() => { walking = true; }, 2000);   // 2 s static overview
+
+      function tick() {
+        requestAnimationFrame(tick);
+        gt += 0.012;
+
+        if (walking && !frozen) {
+          walkT += 0.00028;
+          if (walkT >= WALK_MAX_T) {
+            walkT  = WALK_MAX_T;
+            frozen = true;           // freeze here, never loop
+          }
+        }
+
+        const z = CAM_START_Z + (CAM_END_Z - CAM_START_Z) * walkT;
+
+        camera.position.set(
+          Math.sin(gt * 0.38) * 0.018,
+          EYE_Y + Math.sin(gt * 1.85) * 0.012,
+          z
+        );
+        camera.lookAt(
+          Math.sin(gt * 0.25) * 0.015,
+          LOOK_Y + Math.sin(gt * 0.6) * 0.008,
+          CAM_END_Z + 1.0
+        );
+
+        renderer.render(scene, camera);
+      }
+      tick();
+
+    } catch(e) {
+      document.getElementById('loading').innerHTML =
+        `<span class="lbl" style="color:rgba(255,140,100,0.8)">Error: ${e.message}</span>`;
+      console.error(e);
+    }
+  })();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // Click anywhere → Language Forest
+  document.getElementById('c').style.cursor = 'pointer';
+  document.getElementById('c').addEventListener('click', () => {
+    window.location.href = 'language.html';
+  });
+  </script>
+</body>
+</html>
