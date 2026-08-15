@@ -233,7 +233,7 @@
   // ── Main ───────────────────────────────────────────────────────
   (async () => {
     try {
-      const { pos, col, count } = await loadGLBPoints('https://github.com/hanjiaaaaaa876-max/boslit-viz/releases/download/v1.0/forest.glb', 15);
+      const { pos, col, count } = await loadGLBPoints('forest_small.glb', 1);
 
       const geo = new THREE.BufferGeometry();
       geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
